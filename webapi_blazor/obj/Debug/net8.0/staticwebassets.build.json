@@ -1,0 +1,19 @@
+{
+  "Version": 1,
+  "Hash": "eNbfIzjw9+t62Up3Bp8c+6/uUmPXt6sQAyUQPPu1sgI=",
+  "Source": "webapi_blazor",
+  "BasePath": "_content/webapi_blazor",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "webapi_blazor\\wwwroot",
+      "Source": "webapi_blazor",
+      "ContentRoot": "C:\\Users\\DELL\\Downloads\\Documents\\CPS\\DOTNET_01\\CodeTrenLop\\DOTNET_API_BLAZOR\\webapi_blazor\\wwwroot\\",
+      "BasePath": "_content/webapi_blazor",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": []
+}
