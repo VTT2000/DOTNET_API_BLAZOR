@@ -18,7 +18,8 @@ builder.Services.AddScoped<StoreCybersoftContext>();
 var connectionString = builder.Configuration.GetConnectionString("EbayConnection");
 //Kết nối db
 builder.Services.AddDbContext<EbayContext>(options =>options.UseSqlServer(connectionString));
-
+//Auto mapper
+builder.Services.AddAutoMapper(typeof(Program));
 //-----------------------------------------------------------------------------
 
 

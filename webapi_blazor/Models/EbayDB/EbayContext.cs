@@ -21,6 +21,8 @@ public partial class EbayContext : DbContext
 
     public virtual DbSet<ConnectionCountLog> ConnectionCountLogs { get; set; }
 
+    public virtual DbSet<GetListOrderDetailByOrderId> GetListOrderDetailByOrderIds { get; set; }
+
     public virtual DbSet<Group> Groups { get; set; }
 
     public virtual DbSet<Listing> Listings { get; set; }
@@ -34,6 +36,7 @@ public partial class EbayContext : DbContext
     public virtual DbSet<Product> Products { get; set; }
 
     public virtual DbSet<ProductImage> ProductImages { get; set; }
+
     public virtual DbSet<ProductListCategory> ProductListCategories { get; set; }
 
     public virtual DbSet<Rating> Ratings { get; set; }
@@ -56,7 +59,10 @@ public partial class EbayContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Bids__3214EC07E8D45124");
 
             entity.Property(e => e.BidAmount).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
 
             entity.HasOne(d => d.Bidder).WithMany(p => p.Bids)
                 .HasForeignKey(d => d.BidderId)
@@ -73,7 +79,10 @@ public partial class EbayContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__Categori__3214EC07A17FBD1F");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(100);
         });
@@ -84,10 +93,23 @@ public partial class EbayContext : DbContext
 
             entity.ToTable("ConnectionCountLog");
 
-            entity.Property(e => e.ConnectionTime).HasColumnType("datetime");
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.ConnectionTime)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.IpAddress).HasMaxLength(45);
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<GetListOrderDetailByOrderId>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("GetListOrderDetailByOrderId");
+
+            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
         });
 
         modelBuilder.Entity<Group>(entity =>
@@ -96,7 +118,10 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.GroupName, "UQ__Groups__6EFCD434B5176344").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.GroupName).HasMaxLength(50);
         });
@@ -107,11 +132,17 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.SellerId, "IX_Listings_SellerId");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.CurrentPrice).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.EndDate).HasColumnType("datetime");
+            entity.Property(e => e.IsAuction).HasDefaultValue(false);
             entity.Property(e => e.StartingPrice).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("Active");
             entity.Property(e => e.Title).HasMaxLength(100);
 
             entity.HasOne(d => d.Category).WithMany(p => p.Listings)
@@ -131,9 +162,15 @@ public partial class EbayContext : DbContext
 
             entity.ToTable("LoginLog");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.IpAddress).HasMaxLength(45);
-            entity.Property(e => e.LoginTime).HasColumnType("datetime");
+            entity.Property(e => e.IsSuccessful).HasDefaultValue(true);
+            entity.Property(e => e.LoginTime)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.UpdatedAt).HasColumnType("datetime");
             entity.Property(e => e.Username).HasMaxLength(100);
 
@@ -148,8 +185,13 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.BuyerId, "IX_Orders_BuyerId");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
-            entity.Property(e => e.Status).HasMaxLength(50);
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
+            entity.Property(e => e.Status)
+                .HasMaxLength(50)
+                .HasDefaultValue("Pending");
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Buyer).WithMany(p => p.Orders)
@@ -164,7 +206,10 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.OrderId, "IX_OrderDetails_OrderId");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.UnitPrice).HasColumnType("decimal(18, 2)");
 
             entity.HasOne(d => d.Order).WithMany(p => p.OrderDetails)
@@ -184,7 +229,10 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.SellerId, "IX_Products_SellerId");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
 
@@ -205,13 +253,28 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.ProductId, "IX_ProductImages_ProductId");
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.ImageUrl).HasMaxLength(255);
+            entity.Property(e => e.IsPrimary).HasDefaultValue(false);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductImages)
                 .HasForeignKey(d => d.ProductId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__ProductIm__Produ__4AB81AF0");
+        });
+
+        modelBuilder.Entity<ProductListCategory>(entity =>
+        {
+            entity
+                .HasNoKey()
+                .ToView("ProductListCategory");
+
+            entity.Property(e => e.Category).HasMaxLength(100);
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.ProductName).HasMaxLength(100);
         });
 
         modelBuilder.Entity<Rating>(entity =>
@@ -225,7 +288,10 @@ public partial class EbayContext : DbContext
             entity.HasIndex(e => e.RaterId, "IX_Ratings_RaterId");
 
             entity.Property(e => e.Comment).HasMaxLength(500);
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
 
             entity.HasOne(d => d.Product).WithMany(p => p.Ratings)
                 .HasForeignKey(d => d.ProductId)
@@ -248,7 +314,10 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.RoleName, "UQ__Roles__8A2B6160924EDB9B").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.Description).HasMaxLength(255);
             entity.Property(e => e.RoleName).HasMaxLength(50);
         });
@@ -261,7 +330,10 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => new { e.RoleId, e.GroupId }, "UC_RoleGroup").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
 
             entity.HasOne(d => d.Group).WithMany(p => p.RoleGroups)
                 .HasForeignKey(d => d.GroupId)
@@ -282,7 +354,10 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => e.Email, "UQ__Users__A9D105347DE540EE").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.FullName).HasMaxLength(100);
             entity.Property(e => e.PasswordHash).HasMaxLength(255);
@@ -297,7 +372,10 @@ public partial class EbayContext : DbContext
 
             entity.HasIndex(e => new { e.UserId, e.GroupId }, "UC_UserGroup").IsUnique();
 
-            entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.Deleted).HasDefaultValue(false);
 
             entity.HasOne(d => d.Group).WithMany(p => p.UserGroups)
                 .HasForeignKey(d => d.GroupId)

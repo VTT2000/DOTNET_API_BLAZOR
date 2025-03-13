@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi_blazor.models.EbayDB;
+using webapi_blazor.Models.ViewModel;
 //using webapi_blazor.Models;
 
 namespace webapi_blazor.Controllers
@@ -44,10 +45,10 @@ namespace webapi_blazor.Controllers
             return BadRequest("Tham số không hợp lệ !");
         }
 
-         [HttpGet("/product/getProductListCategory")]
+        [HttpGet("/product/getProductListCategory")]
         public async Task<IActionResult> getProductListCategory()
         {
-            
+
             return Ok(_context.ProductListCategories.Skip(0).Take(10));
         }
 
@@ -61,6 +62,46 @@ namespace webapi_blazor.Controllers
             }
             return BadRequest("mã sản phẩm không tồn tại");
         }
+
+        [HttpGet("/GetDetailProductById/{id}")]
+        public async Task<ActionResult> GetDetailProductById(int id)
+        {
+            //var result = _context.Database.SqlQueryRaw<ProductDetailVM>("EXEC GetProductDetailById @id = {0}", id);
+            var result = await _context.Database.SqlQueryRaw<ProductDetailVM>($@"EXEC GetProductDetailImageListById {id}").ToListAsync();
+            #region  groupby
+            //   List<ProductDetailVM> res = new List<ProductDetailVM>();
+            // var resGroup = result.GroupBy(key => new
+            // {
+            //     Id = key.Id,
+            //     Name = key.Name,
+            //     Category = key.Category,
+            //     Price = key
+            // .Price,
+            //     CreateAt = key.CreatedAt
+            // }).ToList();
+            // List<string> lstImg = new List<string>();
+            // foreach (var item in resGroup)
+            // {
+            //     foreach (var img in item)
+            //     {
+            //         lstImg.Add(img.ListImage);
+            //     }
+            // }
+            // ProductDetailVM resFinal = new ProductDetailVM();
+            // resFinal.Id = resGroup.First().Key.Id;
+            // resFinal.Name = resGroup.First().Key.Name;
+            // resFinal.Price = resGroup.First().Key.Id;
+            // resFinal.ListImage = lstImg.ToString();;
+            #endregion
+            
+            if (result.Count() == 0)
+            {
+                return BadRequest("id không tồn tại");
+            }
+
+            return Ok(result);
+        }
+
 
 
     }
