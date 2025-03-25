@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi_blazor.models.EbayDB;
@@ -22,6 +23,7 @@ namespace webapi_blazor.Controllers
             _context = db;
         }
 
+        [Authorize(Roles ="Seller")]
         [HttpGet("/product/getall")]
         public async Task<IActionResult> getAll(int pageIndex = 0, int pageSize = 10)
         {

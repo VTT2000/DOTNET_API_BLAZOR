@@ -3,37 +3,60 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using webapi_blazor.Models;
+using webapi_blazor.Filter;
 //using webapi_blazor.Models;
 
 namespace webapi_blazor.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableCors("allow_GET")]
     public class DemoController : ControllerBase
     {
-        private readonly StoreCybersoftContext _context;
-        public DemoController(StoreCybersoftContext db)
+        private readonly StoreCybersoftContext _context = new StoreCybersoftContext();
+        public DemoController()
         {
-            _context = db;
+            // _context = db;
         }
+
+        [DemoFilter]
+        [ServiceFilter(typeof(CustomFilter))]
+        [HttpPost("post")]
+        public async Task<IActionResult> post([FromForm]User model) {
+            //action handler
+         
+
+            return Ok("post ok");
+        }
+
+        [HttpGet("HandleUser")]
+        public async Task<IActionResult> HandleUser() {
+            
+            int b = 0;
+            int res = 10 / b;
+
+            return Ok(res);
+        }
+
+
 
         [HttpGet("GetAll")]
         public async Task<ActionResult> GetAll()
         {
-            List<User> lstUser = _context.Users.ToList(); 
+            List<User> lstUser = _context.Users.ToList();
             return Ok(lstUser);
         }
-
         [HttpGet("GetAllSQLRaw")]
         public async Task<ActionResult> GetAllSQLRaw()
         {
             List<User> lstUser = _context.Users.FromSqlRaw("Select * From Users").ToList();
             return Ok(lstUser);
         }
-        
+
         [HttpPost("AddUser")]
         public async Task<ActionResult> AddUser([FromBody] User newUser)
         {  
@@ -42,14 +65,12 @@ namespace webapi_blazor.Controllers
             _context.SaveChanges(); //Lưu vào db thật
             return Ok(_context.Users.ToList());
         }
-
         [HttpPost("AddUserRaw")]
         public async Task<ActionResult> AddUserRaw([FromBody] User newUser)
         {  
             string sqlCommand = $"INSERT INTO Users(Name,Age,Email,Additional) values(N'{newUser.Name}','{newUser.Age}','{newUser.Email}','{newUser.Additional}')";
             //linq:
             _context.Database.ExecuteSqlRaw(sqlCommand);
-            
             return Ok(_context.Users.ToList());
         }
 
@@ -63,16 +84,19 @@ namespace webapi_blazor.Controllers
             }
             return Ok(_context.Users.ToList());
         }
-        
         [HttpDelete("/deleteraw/{id}")]
         public async Task<ActionResult> Deleteraw([FromRoute]int id)
         {
+            // _context.Database.BeginTransaction();
             string sqlCommand = $"DELETE FROM Users where Id={id}";
             //linq:
             _context.Database.ExecuteSqlRaw(sqlCommand);
+            // _context.Database.RollbackTransaction();
+            // _context.Database.CommitTransaction();
             return Ok(_context.Users.ToList());
         }
-        
+
+
         [HttpPut("/edit/{id}")]
         public async Task<IActionResult> Update([FromRoute]int id,[FromBody] User userEdit)
         {
@@ -95,6 +119,11 @@ namespace webapi_blazor.Controllers
             }
             return Ok(_context.Users.ToList());
         }
+
+
+
+        
+    
 
     }
 }
