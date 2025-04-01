@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using webapi_blazor.Filter;
 using webapi_blazor.Helper;
 using webapi_blazor.Middleware;
 using webapi_blazor.models.EbayDB;
@@ -56,8 +57,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 // Đọc connection string từ appsettings.json
 var connectionString = builder.Configuration.GetConnectionString("EbayConnection");
+// //Kết nối db
+// builder.Services.AddDbContext<EbayContext>(options => options.UseSqlServer(connectionString));
 //Kết nối db
-builder.Services.AddDbContext<EbayContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<EbayContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString));
 //Kết nối db 2 
 // builder.Services.AddDbContext<EbayContextExtend>(options =>options.UseSqlServer(connectionString));
 //DI service Auto mapper
@@ -119,6 +122,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 // Thêm dịch vụ Authorization để hỗ trợ phân quyền người dùng
 builder.Services.AddAuthorization();
 
+//filter
+builder.Services.AddScoped<CustomFilter>();
+builder.Services.AddScoped<LogFilter>();
+builder.Services.AddScoped<FilterDemoAsync>();
+
+// cache
+builder.Services.AddMemoryCache();
 //-----------------------------------------------------------------------------
 
 

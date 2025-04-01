@@ -149,3 +149,5 @@ C:\Users\DELL\Downloads\Documents\CPS\DOTNET_01\CodeTrenLop\DOTNET_API_BLAZOR\we
 C:\Users\DELL\Downloads\Documents\CPS\DOTNET_01\CodeTrenLop\DOTNET_API_BLAZOR\webapi_blazor\obj\Debug\net8.0\ref\webapi_blazor.dll
 C:\Users\DELL\Downloads\Documents\CPS\DOTNET_01\CodeTrenLop\DOTNET_API_BLAZOR\webapi_blazor\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\Users\DELL\Downloads\Documents\CPS\DOTNET_01\CodeTrenLop\DOTNET_API_BLAZOR\webapi_blazor\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\DELL\Downloads\Documents\CPS\DOTNET_01\CodeTrenLop\DOTNET_API_BLAZOR\webapi_blazor\bin\Debug\net8.0\Castle.Core.dll
+C:\Users\DELL\Downloads\Documents\CPS\DOTNET_01\CodeTrenLop\DOTNET_API_BLAZOR\webapi_blazor\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Proxies.dll

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,14 @@ namespace webapi_blazor.Controllers
     public class ProductController : ControllerBase
     {
         private readonly EbayContext _context;
-        public ProductController(EbayContext db)
+        private readonly IMapper _mapper;
+        public ProductController(EbayContext db, IMapper mapper)
         {
             _context = db;
+            _mapper = mapper;
         }
+        
+
 
         [Authorize(Roles ="Seller")]
         [HttpGet("/product/getall")]
@@ -68,7 +73,7 @@ namespace webapi_blazor.Controllers
         [HttpGet("/GetDetailProductById/{id}")]
         public async Task<ActionResult> GetDetailProductById(int id)
         {
-            //var result = _context.Database.SqlQueryRaw<ProductDetailVM>("EXEC GetProductDetailById @id = {0}", id);
+            // var result = await _context.Set<ProductDetailVM>().FromSqlRaw($@"EXEC GetProductDetailById {id}").ToListAsync();
             var result = await _context.Database.SqlQueryRaw<ProductDetailVM>($@"EXEC GetProductDetailImageListById {id}").ToListAsync();
             #region  groupby
             //   List<ProductDetailVM> res = new List<ProductDetailVM>();
@@ -95,15 +100,23 @@ namespace webapi_blazor.Controllers
             // resFinal.Price = resGroup.First().Key.Id;
             // resFinal.ListImage = lstImg.ToString();;
             #endregion
-            
             if (result.Count() == 0)
             {
                 return BadRequest("id không tồn tại");
             }
-
-            return Ok(result);
+            var res = _mapper.Map<ProductDetailResultVM>(result.FirstOrDefault());
+            return Ok(res);
         }
 
+        
+        [HttpGet("/GetAllUserRole")]
+        public async Task<IActionResult> GetAllUserRole() {
+            var lstUserRole = _context.UserRoles.Include(p => p.Role).Select(ul => new {
+                id = ul.UserId,
+                Role = ul.Role
+            });
+            return Ok(lstUserRole);
+        }
 
 
     }
