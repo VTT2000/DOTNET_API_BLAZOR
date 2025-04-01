@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 using webapi_blazor.Filter;
 using webapi_blazor.Helper;
 using webapi_blazor.Middleware;
@@ -60,7 +61,7 @@ var connectionString = builder.Configuration.GetConnectionString("EbayConnection
 // //Kết nối db
 // builder.Services.AddDbContext<EbayContext>(options => options.UseSqlServer(connectionString));
 //Kết nối db
-builder.Services.AddDbContext<EbayContext>(options => options.UseLazyLoadingProxies().UseSqlServer(connectionString));
+builder.Services.AddDbContext<EbayContext>(options => options.UseLazyLoadingProxies(false).UseSqlServer(connectionString));
 //Kết nối db 2 
 // builder.Services.AddDbContext<EbayContextExtend>(options =>options.UseSqlServer(connectionString));
 //DI service Auto mapper
@@ -129,6 +130,22 @@ builder.Services.AddScoped<FilterDemoAsync>();
 
 // cache
 builder.Services.AddMemoryCache();
+
+//cache redis
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379"; // hoặc connection string từ Cloud
+    options.InstanceName = "Ebay:";
+});
+
+//Làm việc với nhiều db redis
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp => {
+  return ConnectionMultiplexer.Connect("localhost:6379");
+});
+
+builder.Services.AddSingleton<RedisHelper>();
+
+
 //-----------------------------------------------------------------------------
 
 
