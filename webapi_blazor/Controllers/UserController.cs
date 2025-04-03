@@ -19,7 +19,9 @@ namespace webapi_blazor.Controllers
     {
         private readonly EbayContext _context ;
         private readonly JwtAuthService _jwtService ;
-        public UserController(EbayContext db, JwtAuthService jwt)
+        private readonly IUserService _userService;
+
+        public UserController(EbayContext db, JwtAuthService jwt, IUserService userService)
         {
             _context = db;
             _jwtService = jwt;
@@ -59,6 +61,14 @@ namespace webapi_blazor.Controllers
         public async Task<ActionResult> PostNew() {
 
             return Ok("");
+        }
+
+        [HttpGet("GetAllUser")]
+        public async Task<dynamic> GetAllUser()
+        {
+            var res = _userService.GetAllAsync();
+        
+            return Ok(res);
         }
        
     }
